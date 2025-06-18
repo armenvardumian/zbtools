@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Zabbix Export</title>
+</head>
+<body>
+  <button onclick="exportCSV()">📥 Export CSV</button>
+
+  <script>
+    function exportCSV() {
+      const table = window.parent.document.querySelector('table.list-table');
+      if (!table) return alert('❌ Таблица не найдена');
+
+      const rows = Array.from(table.querySelectorAll('tr'));
+      const csv = rows.map(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        return cells.map(cell => `"${cell.innerText.trim().replace(/"/g, '""')}"`).join(',');
+      }).join('\n');
+
+      const now = new Date().toISOString().slice(0, 10);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `zabbix-table-${now}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
